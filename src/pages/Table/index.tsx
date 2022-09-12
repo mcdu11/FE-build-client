@@ -190,7 +190,7 @@ const TableList: React.FC<unknown> = () => {
                   console.log(val);
                   await deploy({
                     name: record.name,
-                    url: record.clone_url,
+                    url: record.ssh_url,
                     branch: val,
                     sprintId: '002',
                   });
