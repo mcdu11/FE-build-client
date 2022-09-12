@@ -42,5 +42,5 @@ export default defineConfig({
     type: 'browser',
   },
   publicPath: process.env.NODE_ENV === 'production' ? '/FE-build-client/' : '/',
-  base: '/',
+  base: '/FE-build-client',
 });
