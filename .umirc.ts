@@ -38,5 +38,6 @@ export default defineConfig({
       pathRewrite: { '^/api2': '' },
     },
   },
-  publicPath: process.env.NODE_ENV === 'production' ? '/FE-build-client/' : '/' 
+  publicPath: process.env.NODE_ENV === 'production' ? '/FE-build-client/' : '/',
+  base: process.env.NODE_ENV === 'production' ? '/FE-build-client' : '/',
 });
