@@ -39,5 +39,4 @@ export default defineConfig({
     },
   },
   publicPath: process.env.NODE_ENV === 'production' ? '/FE-build-client/' : '/',
-  base: process.env.NODE_ENV === 'production' ? '/FE-build-client' : '/',
 });
