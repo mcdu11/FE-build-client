@@ -21,3 +21,14 @@ export const layout: RuntimeConfig['layout'] = () => {
     theme: 'dark',
   };
 };
+
+export const request: RuntimeConfig['request'] = {
+  requestInterceptors: [
+    (config: { url: string; }) => {
+      if (config.url.startsWith('/github')) {
+        config.url = 'https://api.github.com' + config.url.replace(/^\/github/, '');
+      }
+      return { ...config };
+    },
+  ],
+};
