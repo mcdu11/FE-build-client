@@ -96,50 +96,6 @@ export async function deleteUser(
 }
 
 /** 此处后端没有提供注释 GET /api/v1/queryUserList */
-export async function queryRepoList(
-  params: {
-    // query
-    /** keyword */
-    keyword?: string;
-    /** current */
-    current?: number;
-    /** pageSize */
-    pageSize?: number;
-  },
-  options?: { [key: string]: any },
-) {
-  return request<API.Result_PageInfo_UserInfo__>('/api/v1/queryRepos', {
-    method: 'GET',
-    params: {
-      ...params,
-    },
-    ...(options || {}),
-  });
-}
-
-/** 此处后端没有提供注释 GET /api/v1/queryUserList */
-export async function queryBranchs(
-  params: {
-    // query
-    /** keyword */
-    keyword?: string;
-    /** current */
-    current?: number;
-    /** pageSize */
-    pageSize?: number;
-  },
-  options?: { [key: string]: any },
-) {
-  return request<API.Result_PageInfo_UserInfo__>('/api/v1/queryBranchs', {
-    method: 'GET',
-    params: {
-      ...params,
-    },
-    ...(options || {}),
-  });
-}
-
-/** 此处后端没有提供注释 GET /api/v1/queryUserList */
 export async function deploy(
   data: {
     url: string;

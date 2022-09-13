@@ -1,17 +1,17 @@
 import services from '@/services/demo';
 import {
   deploy,
-  queryBranchs,
-  queryRepoList,
 } from '@/services/demo/UserController';
+import { queryBranchList, queryRepoList } from '@/services/github';
 import {
   ActionType,
   FooterToolbar,
   PageContainer,
+  ProColumns,
   ProDescriptions,
-  ProDescriptionsItemProps,
   ProTable,
 } from '@ant-design/pro-components';
+import { useModel } from '@umijs/max';
 import { Button, Divider, Drawer, message, Modal, Select, Tag } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
@@ -23,7 +23,7 @@ const { addUser, deleteUser, modifyUser } = services.UserController;
  * 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.UserInfo) => {
+const handleAdd = async (fields: GitHubAPI.Repo) => {
   const hide = message.loading('正在添加');
   try {
     await addUser({ ...fields });
@@ -69,12 +69,12 @@ const handleUpdate = async (fields: FormValueType) => {
  *  删除节点
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: API.UserInfo[]) => {
+const handleRemove = async (selectedRows: GitHubAPI.Repo[]) => {
   const hide = message.loading('正在删除');
   if (!selectedRows) return true;
   try {
     await deleteUser({
-      userId: selectedRows.find((row) => row.id)?.id || '',
+      userId: String(selectedRows.find((row) => row.id)?.id || ''),
     });
     hide();
     message.success('删除成功，即将刷新');
@@ -87,14 +87,16 @@ const handleRemove = async (selectedRows: API.UserInfo[]) => {
 };
 
 const TableList: React.FC<unknown> = () => {
+  const { initialState } = useModel('@@initialState');
+
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] =
     useState<boolean>(false);
   const [stepFormValues, setStepFormValues] = useState({});
   const actionRef = useRef<ActionType>();
-  const [row, setRow] = useState<API.UserInfo>();
-  const [selectedRowsState, setSelectedRows] = useState<API.UserInfo[]>([]);
-  const columns: ProDescriptionsItemProps<API.UserInfo>[] = [
+  const [row, setRow] = useState<GitHubAPI.Repo>();
+  const [selectedRowsState, setSelectedRows] = useState<GitHubAPI.Repo[]>([]);
+  const columns: ProColumns<GitHubAPI.Repo>[] = [
     {
       title: '名称',
       dataIndex: 'name',
@@ -166,8 +168,8 @@ const TableList: React.FC<unknown> = () => {
                 const [branchs, setBranchs] = useState<any[]>([]);
 
                 const fetchBranchs = async () => {
-                  const res = await queryBranchs({});
-                  setBranchs(res?.data?.list || []);
+                  const res = await queryBranchList({ owner: initialState?.owner || '', repo: record.name});
+                  setBranchs(res || []);
                 };
                 useEffect(() => {
                   fetchBranchs();
@@ -184,10 +186,9 @@ const TableList: React.FC<unknown> = () => {
               };
               let val = '';
               Modal.confirm({
-                title: '选择分支',
-                content: <Content onChange={(v) => (val = v)} />,
+                title: `选择分支:(${record.name})`,
+                content: <Content onChange={(v: string) => (val = v)} />,
                 async onOk() {
-                  console.log(val);
                   await deploy({
                     name: record.name,
                     url: record.ssh_url,
@@ -208,11 +209,11 @@ const TableList: React.FC<unknown> = () => {
   return (
     <PageContainer
       header={{
-        title: 'CRUD 示例',
+        title: 'Github 仓库',
       }}
     >
-      <ProTable<API.UserInfo>
-        headerTitle="查询表格"
+      <ProTable<GitHubAPI.Repo>
+        headerTitle="仓库列表"
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -231,16 +232,22 @@ const TableList: React.FC<unknown> = () => {
           </Button>,
         ]}
         request={async (params, sorter, filter) => {
-          const { data, success } = await queryRepoList({
+          if (!initialState?.owner) {
+            return {
+              data: [],
+            }
+          }
+          const res = await queryRepoList({
             ...params,
             // FIXME: remove @ts-ignore
             // @ts-ignore
             sorter,
             filter,
+            owner: initialState.owner,
           });
           return {
-            data: data?.list || [],
-            success,
+            data: res || [],
+            success: true,
           };
         }}
         columns={columns}
@@ -274,7 +281,7 @@ const TableList: React.FC<unknown> = () => {
         onCancel={() => handleModalVisible(false)}
         modalVisible={createModalVisible}
       >
-        <ProTable<API.UserInfo, API.UserInfo>
+        <ProTable<GitHubAPI.Repo, GitHubAPI.Repo>
           onSubmit={async (value) => {
             const success = await handleAdd(value);
             if (success) {
@@ -319,7 +326,7 @@ const TableList: React.FC<unknown> = () => {
         closable={false}
       >
         {row?.name && (
-          <ProDescriptions<API.UserInfo>
+          <ProDescriptions<GitHubAPI.Repo>
             column={2}
             title={row?.name}
             request={async () => ({

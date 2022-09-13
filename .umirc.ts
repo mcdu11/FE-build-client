@@ -37,6 +37,11 @@ export default defineConfig({
       changeOrigin: true,
       pathRewrite: { '^/api2': '' },
     },
+    '/github': {
+      target: 'https://api.github.com',
+      changeOrigin: true,
+      pathRewrite: { '^/github': '' },
+    },
   },
   history: {
     type: 'hash',
