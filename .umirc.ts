@@ -43,9 +43,14 @@ export default defineConfig({
       pathRewrite: { '^/github': '' },
     },
   },
-  history: {
-    type: 'hash',
-  },
+  // history: {
+  //   type: 'hash',
+  // },
   publicPath: '/FE-build-client/',
-  // base: '/FE-build-client/',
+  /* 
+  4.0.19 bugs dumplcate path 
+  https://github.com/umijs/umi/pull/9296 
+  https://github.com/umijs/umi/issues/9287
+  */
+  base: '/FE-build-client/',
 });
