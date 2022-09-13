@@ -42,5 +42,5 @@ export default defineConfig({
     type: 'hash',
   },
   publicPath: '/FE-build-client/',
-  base: '/FE-build-client/',
+  // base: '/FE-build-client/',
 });
